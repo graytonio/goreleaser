@@ -4,6 +4,7 @@ package defaults
 
 import (
 	"fmt"
+	"github.com/goreleaser/goreleaser/internal/pipe/ko"
 
 	"github.com/goreleaser/goreleaser/internal/pipe/archive"
 	"github.com/goreleaser/goreleaser/internal/pipe/artifactory"
@@ -72,6 +73,7 @@ var Defaulters = []Defaulter{
 	aur.Pipe{},
 	brew.Pipe{},
 	krew.Pipe{},
+	ko.Pipe{},
 	scoop.Pipe{},
 	discord.Pipe{},
 	reddit.Pipe{},

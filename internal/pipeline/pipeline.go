@@ -3,6 +3,7 @@ package pipeline
 
 import (
 	"fmt"
+	"github.com/goreleaser/goreleaser/internal/pipe/ko"
 
 	"github.com/goreleaser/goreleaser/internal/pipe/announce"
 	"github.com/goreleaser/goreleaser/internal/pipe/archive"
@@ -104,6 +105,8 @@ var Pipeline = append(
 	brew.Pipe{},
 	// krew plugins
 	krew.Pipe{},
+	// ko
+	ko.Pipe{},
 	// create scoop buckets
 	scoop.Pipe{},
 	// create and push docker images
