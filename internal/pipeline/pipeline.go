@@ -3,7 +3,6 @@ package pipeline
 
 import (
 	"fmt"
-	"github.com/goreleaser/goreleaser/internal/pipe/ko"
 
 	"github.com/goreleaser/goreleaser/internal/pipe/announce"
 	"github.com/goreleaser/goreleaser/internal/pipe/archive"
@@ -20,6 +19,7 @@ import (
 	"github.com/goreleaser/goreleaser/internal/pipe/env"
 	"github.com/goreleaser/goreleaser/internal/pipe/git"
 	"github.com/goreleaser/goreleaser/internal/pipe/gomod"
+	"github.com/goreleaser/goreleaser/internal/pipe/ko"
 	"github.com/goreleaser/goreleaser/internal/pipe/krew"
 	"github.com/goreleaser/goreleaser/internal/pipe/metadata"
 	"github.com/goreleaser/goreleaser/internal/pipe/nfpm"

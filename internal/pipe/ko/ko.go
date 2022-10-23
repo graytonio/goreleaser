@@ -1,8 +1,11 @@
 package ko
 
 import (
-	"context"
+	stdctx "context"
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
@@ -13,22 +16,20 @@ import (
 	"github.com/goreleaser/goreleaser/internal/semerrgroup"
 	"github.com/goreleaser/goreleaser/internal/tmpl"
 	"github.com/goreleaser/goreleaser/pkg/config"
-	gcontext "github.com/goreleaser/goreleaser/pkg/context"
+	"github.com/goreleaser/goreleaser/pkg/context"
 	"golang.org/x/tools/go/packages"
-	"os"
-	"path/filepath"
 )
 
 // Pipe that catalogs common artifacts as an SBOM.
 type Pipe struct{}
 
-func (Pipe) String() string { return "running ko" }
-func (Pipe) Skip(ctx *gcontext.Context) bool {
+func (Pipe) String() string { return "ko" }
+func (Pipe) Skip(ctx *context.Context) bool {
 	return ctx.SkipKo || ctx.Config.Ko.ID == ""
 }
 
 // Default sets the Pipes defaults.
-func (Pipe) Default(ctx *gcontext.Context) error {
+func (Pipe) Default(ctx *context.Context) error {
 	ids := ids.New("kos")
 	cfg := &ctx.Config.Ko
 	if err := setConfigDefaults(cfg); err != nil {
@@ -53,7 +54,7 @@ func setConfigDefaults(cfg *config.Ko) error {
 }
 
 // Run executes the Pipe.
-func (Pipe) Run(ctx *gcontext.Context) error {
+func (Pipe) Run(ctx *context.Context) error {
 	g := semerrgroup.New(ctx.Parallelism)
 	g.Go(doBuild(ctx))
 	return g.Wait()
@@ -74,7 +75,7 @@ type buildOptions struct {
 	baseImportPaths      bool
 }
 
-func (o *buildOptions) makeBuilder(ctx context.Context) (*build.Caching, error) {
+func (o *buildOptions) makeBuilder(ctx *context.Context) (*build.Caching, error) {
 	bo := []build.Option{
 		build.WithConfig(map[string]build.Config{
 			o.ip: {
@@ -82,7 +83,7 @@ func (o *buildOptions) makeBuilder(ctx context.Context) (*build.Caching, error) 
 			},
 		}),
 		build.WithPlatforms(o.platforms...),
-		build.WithBaseImages(func(ctx context.Context, s string) (name.Reference, build.Result, error) {
+		build.WithBaseImages(func(ctx stdctx.Context, s string) (name.Reference, build.Result, error) {
 			ref, err := name.ParseReference(o.baseImage)
 			if err != nil {
 				return nil, nil, err
@@ -124,7 +125,7 @@ func (o *buildOptions) makeBuilder(ctx context.Context) (*build.Caching, error) 
 	return build.NewCaching(b)
 }
 
-func doBuild(ctx *gcontext.Context) func() error {
+func doBuild(ctx *context.Context) func() error {
 	return func() error {
 		opts, err := fromConfig(ctx, ctx.Config.Ko)
 		if err != nil {
@@ -163,7 +164,7 @@ func doBuild(ctx *gcontext.Context) func() error {
 	}
 }
 
-func fromConfig(ctx *gcontext.Context, cfg config.Ko) (*buildOptions, error) {
+func fromConfig(ctx *context.Context, cfg config.Ko) (*buildOptions, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, err

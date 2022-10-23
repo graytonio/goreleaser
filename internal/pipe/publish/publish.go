@@ -3,6 +3,7 @@ package publish
 
 import (
 	"fmt"
+
 	"github.com/goreleaser/goreleaser/internal/middleware/errhandler"
 	"github.com/goreleaser/goreleaser/internal/middleware/logging"
 	"github.com/goreleaser/goreleaser/internal/middleware/skip"
